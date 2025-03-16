@@ -10,6 +10,7 @@ Ensure you have the following software installed to get started:
 - [PuTTY](https://www.putty.org/) for SSH connection with Raspberry Pi
 - [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to flash SD cards
 - [Git](https://git-scm.com/) and [GitHub](https://github.com/) to download the code
+-[vscode](https://code.visualstudio.com/) to write you code
 
 ### Environment Setup
 
@@ -39,7 +40,7 @@ best alternative solution save the image itsefl into the database , now we gonna
 2- classifie and save into database
 3-rotate motor
 
-![screenshot](static/thumbnails/Screenshot_222412.png)
-![screenshot](static/thumbnails/Screenshot_222430.png)
-![screenshot](static/thumbnails/Screenshot_222446.png)
-![screenshot](static/thumbnails/Screenshot_222458.png)
+- [click_with_crtl_left_mouse_to_open](static/thumbnails/Screenshot_222412.png)
+- [index](static/thumbnails/Screenshot_222430.png)
+- [history](static/thumbnails/Screenshot_222446.png)
+- [history](static/thumbnails/Screenshot_222458.png)
