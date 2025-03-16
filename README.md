@@ -1,16 +1,28 @@
--please use conda and create new environnement with python 3.9  
+## Setup Instructions
 
-- run " pip install -r requirements.txt "   in you command line windows
+### Prerequisites
 
+Ensure you have the following software installed to get started:
 
-make sure to heve :
+- [DB Browser for SQLite](https://sqlitebrowser.org/) for database management
+- [Autodesk Fusion 360](https://www.autodesk.com/products/fusion-360/overview) for 3D design
+- [Arduino IDE](https://www.arduino.cc/en/software) for motor control
+- [PuTTY](https://www.putty.org/) for SSH connection with Raspberry Pi
+- [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to flash SD cards
+- [Git](https://git-scm.com/) and [GitHub](https://github.com/) to download the code
 
--dbbrowser ( for database managment)
--fusion 360 (for 3D design)
--arduino idle (for motor)
--putty ( fo ssh connection with raspberry)
--rasperry pi imager ( to flash sd card)
--git and github to download the code
+### Environment Setup
+
+1. **Create a new Conda environment with Python 3.9:**
+   ```bash
+   conda create --name myenv python=3.9
+   conda activate myenv
+   ```
+
+2. **Install the required packages:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 all required knowledge
 
@@ -24,3 +36,10 @@ best alternative solution save the image itsefl into the database , now we gonna
 
 
 1 - detect image
+2- classifie and save into database
+3-rotate motor
+
+static/thumbnails/Screenshot_222412.png
+static/thumbnails/Screenshot_222430.png
+static/thumbnails/Screenshot_222446.png
+static/thumbnails/Screenshot_222458.png
