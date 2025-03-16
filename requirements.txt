@@ -1,0 +1,6 @@
+tensorflow
+opencv-python-headless
+pyserial
+tensorflow==2.12.0
+flask
+pillow

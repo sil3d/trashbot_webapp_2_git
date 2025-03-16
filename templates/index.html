@@ -1,0 +1,469 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tri Automatique des Déchets</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .header {
+        background: linear-gradient(135deg, #444444, #e9db1d);
+        color: white;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: transform 0.3s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+      }
+      .video-container {
+        position: relative;
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .result-container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+      .btn-primary {
+        background-color: #e48101;
+        border-color: #43a047;
+      }
+      .btn-primary:hover {
+        background-color: #c21313;
+        border-color: #2e7d32;
+      }
+      .btn-secondary {
+        background-color: #546e7a;
+        border-color: #546e7a;
+      }
+      .btn-secondary:hover {
+        background-color: #37474f;
+        border-color: #37474f;
+      }
+      .material-icon {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+      .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+      }
+      .result-animation {
+        animation: fadeIn 0.5s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header text-center">
+      <h1>
+        <i class="fas fa-recycle"></i> Système de Tri Automatique des Déchets
+      </h1>
+      <p>
+        Utilisation de l'IA pour identifier et trier les matériaux recyclables
+      </p>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header bg-primary text-white">
+              <h3>Caméra en direct</h3>
+            </div>
+            <div class="card-body">
+              <div class="video-container">
+                <img
+                  src="{{ url_for('video_feed') }}"
+                  width="100%"
+                  alt="Flux vidéo"
+                />
+                <div
+                  id="camera-status"
+                  class="status-badge bg-success text-white"
+                >
+                  Connecté
+                </div>
+              </div>
+              <div class="mt-3 text-center">
+                <button id="classify-btn" class="btn btn-primary btn-lg">
+                  <i class="fas fa-camera"></i> Classifier l'objet
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div
+            id="result-section"
+            class="result-container d-none result-animation"
+          >
+            <h3 class="text-center mb-4">Résultat de la classification</h3>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="text-center">
+                  <img
+                    id="captured-image"
+                    src=""
+                    alt="Image capturée"
+                    class="img-fluid rounded"
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="text-center">
+                  <div id="material-icon" class="material-icon">
+                    <i class="fas fa-question-circle"></i>
+                  </div>
+                  <h4 id="material-class">En attente...</h4>
+                  <div class="progress mt-3">
+                    <div
+                      id="confidence-bar"
+                      class="progress-bar"
+                      role="progressbar"
+                      style="width: 0%"
+                      aria-valuenow="0"
+                      aria-valuemin="0"
+                      aria-valuemax="100"
+                    >
+                      0%
+                    </div>
+                  </div>
+                  <p id="confidence-text" class="mt-2">Confidence: 0%</p>
+                  <div class="mt-3" id="motor-status">
+                    <span class="badge bg-secondary">Moteur: En attente</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h3>Contrôle manuel</h3>
+            </div>
+            <div class="card-body">
+              <p>Envoyez manuellement des commandes au trieur automatique:</p>
+              <div class="d-grid gap-2">
+                <button
+                  class="btn btn-outline-success manual-btn"
+                  data-class="plastic"
+                >
+                  <i class="fas fa-bottle-water"></i> Plastique (Bac 1)
+                </button>
+                <button
+                  class="btn btn-outline-secondary manual-btn"
+                  data-class="metal"
+                >
+                  <i class="fas fa-can-food"></i> Métal (Bac 2)
+                </button>
+                <button
+                  class="btn btn-outline-info manual-btn"
+                  data-class="glass"
+                >
+                  <i class="fas fa-wine-bottle"></i> Verre (Bac 3)
+                </button>
+                <button
+                  class="btn btn-outline-warning manual-btn"
+                  data-class="unknown"
+                >
+                  <i class="fas fa-trash"></i> Inconnu (Bac 4)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+              <h3>État du système</h3>
+            </div>
+            <div class="card-body">
+              <ul class="list-group">
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  Modèle AI
+                  <span id="model-status" class="badge bg-success">Chargé</span>
+                </li>
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  Caméra
+                  <span id="camera-status-sidebar" class="badge bg-success"
+                    >Connecté</span
+                  >
+                </li>
+                <li
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  Arduino
+                  <span id="arduino-status" class="badge bg-warning"
+                    >Vérification...</span
+                  >
+                </li>
+              </ul>
+              <div class="mt-3 text-center">
+                <a href="{{ url_for('history') }}" class="btn btn-info">
+                  <i class="fas fa-history"></i> Voir l'historique
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+      <p>
+        © 2025 Système de Tri Automatique des Déchets | Powered by Flask &
+        TensorFlow
+      </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/123456789.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Vérifier l'état du système au chargement
+        checkSystemStatus();
+
+        // Bouton de classification
+        document
+          .getElementById("classify-btn")
+          .addEventListener("click", function () {
+            classifyObject();
+          });
+
+        // Boutons de contrôle manuel
+        document.querySelectorAll(".manual-btn").forEach(function (button) {
+          button.addEventListener("click", function () {
+            const materialClass = this.getAttribute("data-class");
+            sendManualCommand(materialClass);
+          });
+        });
+
+        // Vérifier l'état du système toutes les 30 secondes
+        setInterval(checkSystemStatus, 30000);
+      });
+
+      function checkSystemStatus() {
+        fetch("/status")
+          .then((response) => response.json())
+          .then((data) => {
+            // Mettre à jour les indicateurs d'état
+            updateStatusIndicator("model-status", data.model_loaded);
+            updateStatusIndicator("camera-status", data.camera_connected);
+            updateStatusIndicator(
+              "camera-status-sidebar",
+              data.camera_connected
+            );
+            updateStatusIndicator("arduino-status", data.arduino_connected);
+          })
+          .catch((error) => {
+            console.error("Erreur lors de la vérification de l'état:", error);
+          });
+      }
+
+      function updateStatusIndicator(elementId, isConnected) {
+        const element = document.getElementById(elementId);
+        if (isConnected) {
+          element.className = "badge bg-success";
+          element.textContent = "Connecté";
+        } else {
+          element.className = "badge bg-danger";
+          element.textContent = "Déconnecté";
+        }
+      }
+
+      function classifyObject() {
+        const classifyBtn = document.getElementById("classify-btn");
+        classifyBtn.disabled = true;
+        classifyBtn.innerHTML =
+          '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Classification...';
+
+        fetch("/classify", {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Afficher la section de résultats
+            document
+              .getElementById("result-section")
+              .classList.remove("d-none");
+
+            // Mettre à jour l'image capturée
+            document.getElementById("captured-image").src =
+              "/" + data.image_path;
+
+            // Mettre à jour la classe de matériau
+            document.getElementById("material-class").textContent =
+              capitalizeFirstLetter(data.class);
+
+            // Mettre à jour l'icône du matériau
+            updateMaterialIcon(data.class);
+
+            // Mettre à jour la barre de confiance
+            const confidencePercentage = (
+              parseFloat(data.confidence) * 100
+            ).toFixed(1);
+            const confidenceBar = document.getElementById("confidence-bar");
+            confidenceBar.style.width = confidencePercentage + "%";
+            confidenceBar.textContent = confidencePercentage + "%";
+            confidenceBar.setAttribute("aria-valuenow", confidencePercentage);
+            document.getElementById("confidence-text").textContent =
+              "Confiance: " + confidencePercentage + "%";
+
+            // Mise à jour du statut du moteur
+            const motorStatus = document.getElementById("motor-status");
+            if (data.motor_success) {
+              motorStatus.innerHTML =
+                '<span class="badge bg-success">Moteur: Bac activé</span>';
+            } else {
+              motorStatus.innerHTML =
+                '<span class="badge bg-danger">Moteur: Non connecté</span>';
+            }
+
+            // Réactiver le bouton
+            classifyBtn.disabled = false;
+            classifyBtn.innerHTML =
+              '<i class="fas fa-camera"></i> Classifier l\'objet';
+          })
+          .catch((error) => {
+            console.error("Erreur lors de la classification:", error);
+            document
+              .getElementById("result-section")
+              .classList.remove("d-none");
+            document.getElementById("material-class").textContent =
+              "Erreur de classification";
+            document.getElementById("material-icon").innerHTML =
+              '<i class="fas fa-exclamation-triangle text-danger"></i>';
+
+            // Réactiver le bouton
+            classifyBtn.disabled = false;
+            classifyBtn.innerHTML =
+              '<i class="fas fa-camera"></i> Classifier l\'objet';
+          });
+      }
+
+      function sendManualCommand(materialClass) {
+        const formData = new FormData();
+        formData.append("class", materialClass);
+
+        fetch("/manual_control", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Feedback visuel temporaire
+            const button = document.querySelector(
+              `.manual-btn[data-class="${materialClass}"]`
+            );
+            const originalContent = button.innerHTML;
+
+            if (data.motor_success) {
+              button.innerHTML = '<i class="fas fa-check"></i> Envoyé!';
+              button.classList.add("btn-success");
+              button.classList.remove(
+                "btn-outline-success",
+                "btn-outline-secondary",
+                "btn-outline-info",
+                "btn-outline-warning"
+              );
+            } else {
+              button.innerHTML = '<i class="fas fa-times"></i> Erreur!';
+              button.classList.add("btn-danger");
+              button.classList.remove(
+                "btn-outline-success",
+                "btn-outline-secondary",
+                "btn-outline-info",
+                "btn-outline-warning"
+              );
+            }
+
+            setTimeout(() => {
+              button.innerHTML = originalContent;
+              button.classList.remove("btn-success", "btn-danger");
+              switch (materialClass) {
+                case "plastic":
+                  button.classList.add("btn-outline-success");
+                  break;
+                case "metal":
+                  button.classList.add("btn-outline-secondary");
+                  break;
+                case "glass":
+                  button.classList.add("btn-outline-info");
+                  break;
+                case "unknown":
+                  button.classList.add("btn-outline-warning");
+                  break;
+              }
+            }, 2000);
+          })
+          .catch((error) => {
+            console.error("Erreur lors de l'envoi de commande:", error);
+          });
+      }
+
+      function updateMaterialIcon(materialClass) {
+        const iconElement = document.getElementById("material-icon");
+        switch (materialClass) {
+          case "plastic":
+            iconElement.innerHTML =
+              '<i class="fas fa-bottle-water text-success"></i>';
+            break;
+          case "metal":
+            iconElement.innerHTML =
+              '<i class="fas fa-can-food text-secondary"></i>';
+            break;
+          case "glass":
+            iconElement.innerHTML =
+              '<i class="fas fa-wine-bottle text-info"></i>';
+            break;
+          default:
+            iconElement.innerHTML =
+              '<i class="fas fa-question-circle text-warning"></i>';
+        }
+      }
+
+      function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+    </script>
+  </body>
+</html>

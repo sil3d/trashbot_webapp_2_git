@@ -1,0 +1,4 @@
+0 No trash
+1 Glass
+2 Metal
+3 Plastic

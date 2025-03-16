@@ -1,0 +1,334 @@
+<!-- templates/history.html -->
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Historique de Tri des Déchets</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .header {
+        background: linear-gradient(135deg, #43a047, #1de9b6);
+        color: white;
+        padding: 20px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .history-item {
+        transition: transform 0.2s;
+      }
+      .history-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+      .material-plastic {
+        border-left: 5px solid #43a047;
+      }
+      .material-metal {
+        border-left: 5px solid #546e7a;
+      }
+      .material-glass {
+        border-left: 5px solid #03a9f4;
+      }
+      .material-unknown {
+        border-left: 5px solid #ff9800;
+      }
+      .btn-back {
+        background-color: #546e7a;
+        border-color: #546e7a;
+      }
+      .btn-back:hover {
+        background-color: #37474f;
+        border-color: #37474f;
+      }
+      .image-thumbnail {
+        max-height: 100px;
+        object-fit: cover;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header text-center">
+      <h1><i class="fas fa-history"></i> Historique de Tri des Déchets</h1>
+      <p>Journal des classifications précédentes et des actions du trieur</p>
+    </div>
+
+    <div class="container">
+      <div class="mb-4">
+        <a href="{{ url_for('index') }}" class="btn btn-back text-white">
+          <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h3>Historique des Classifications</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Date et heure</th>
+                  <th>Image</th>
+                  <th>Matériau</th>
+                  <th>Confiance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% if data %} {% for item in data %}
+                <tr class="history-item material-{{ item.material_class }}">
+                  <td>{{ item.timestamp }}</td>
+                  <td>
+                    {% if item.image_path %}
+                    <img
+                      src="/{{ item.image_path }}"
+                      class="image-thumbnail"
+                      alt="Image de {{ item.material_class }}"
+                    />
+                    {% else %}
+                    <span class="badge bg-secondary">Pas d'image</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if item.material_class == 'plastic' %}
+                    <span class="badge bg-success">Plastique</span>
+                    {% elif item.material_class == 'metal' %}
+                    <span class="badge bg-secondary">Métal</span>
+                    {% elif item.material_class == 'glass' %}
+                    <span class="badge bg-info">Verre</span>
+                    {% else %}
+                    <span class="badge bg-warning">Inconnu</span>
+                    {% endif %}
+                  </td>
+
+                  <td>{{ (item.confidence * 100)|round(1) }}%</td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="4" class="text-center">
+                    Aucune donnée d'historique disponible
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+          <h3>Statistiques</h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- templates/history.html (suite) -->
+            <div class="col-md-6">
+              <h4>Répartition des matériaux</h4>
+              <canvas id="materialChart" width="400" height="300"></canvas>
+            </div>
+            <div class="col-md-6">
+              <h4>Tendance de confiance</h4>
+              <canvas id="confidenceChart" width="400" height="300"></canvas>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-12">
+              <h4>Activité récente</h4>
+              <canvas id="activityChart" width="800" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+      <p>
+        © 2025 Système de Tri Automatique des Déchets | Powered by Flask &
+        TensorFlow
+      </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://kit.fontawesome.com/123456789.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          // Données pour les graphiques
+          const data = {{ data|tojson }};
+
+          // Préparation des données pour les graphiques
+          const materialCounts = {
+              'plastic': 0,
+              'metal': 0,
+              'glass': 0,
+              'unknown': 0
+          };
+
+          const confidenceData = {
+              'plastic': [],
+              'metal': [],
+              'glass': [],
+              'unknown': []
+          };
+
+          const dateLabels = [];
+          const activityData = [];
+
+          // Organisation des données
+          data.forEach(item => {
+              // Vérifier si le material_class est attendu sinon le forcer à 'unknown'
+              let material = item.material_class;
+              if (!confidenceData.hasOwnProperty(material)) {
+                  material = 'unknown';
+              }
+
+              // Compter les matériaux
+              materialCounts[material]++;
+
+              // Collecter les données de confiance
+              confidenceData[material].push(item.confidence * 100);
+
+              // Données d'activité
+              const date = new Date(item.timestamp);
+              const formattedDate = `${date.toLocaleDateString()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+              dateLabels.unshift(formattedDate);
+              activityData.unshift(item.confidence * 100);
+          });
+
+          // Graphique de répartition des matériaux
+          new Chart(document.getElementById('materialChart'), {
+              type: 'pie',
+              data: {
+                  labels: ['Plastique', 'Métal', 'Verre', 'Inconnu'],
+                  datasets: [{
+                      data: [
+                          materialCounts.plastic,
+                          materialCounts.metal,
+                          materialCounts.glass,
+                          materialCounts.unknown
+                      ],
+                      backgroundColor: [
+                          '#43a047',  // Vert pour plastique
+                          '#546e7a',  // Gris pour métal
+                          '#03a9f4',  // Bleu pour verre
+                          '#ff9800'   // Orange pour inconnu
+                      ],
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  plugins: {
+                      legend: {
+                          position: 'right',
+                      },
+                      title: {
+                          display: true,
+                          text: 'Distribution des types de matériaux'
+                      }
+                  }
+              }
+          });
+
+          // Calcul des moyennes de confiance
+          const getAverageConfidence = (values) => {
+              if (values.length === 0) return 0;
+              return values.reduce((sum, val) => sum + val, 0) / values.length;
+          };
+
+          // Graphique de confiance moyenne
+          new Chart(document.getElementById('confidenceChart'), {
+              type: 'bar',
+              data: {
+                  labels: ['Plastique', 'Métal', 'Verre', 'Inconnu'],
+                  datasets: [{
+                      label: 'Confiance moyenne (%)',
+                      data: [
+                          getAverageConfidence(confidenceData.plastic),
+                          getAverageConfidence(confidenceData.metal),
+                          getAverageConfidence(confidenceData.glass),
+                          getAverageConfidence(confidenceData.unknown)
+                      ],
+                      backgroundColor: [
+                          '#43a047',  // Vert pour plastique
+                          '#546e7a',  // Gris pour métal
+                          '#03a9f4',  // Bleu pour verre
+                          '#ff9800'   // Orange pour inconnu
+                      ],
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          max: 100
+                      }
+                  },
+                  plugins: {
+                      title: {
+                          display: true,
+                          text: 'Confiance moyenne par type de matériau'
+                      }
+                  }
+              }
+          });
+
+          // Limiter le nombre de points pour le graphique d'activité
+          const maxPoints = 20;
+          const limitedLabels = dateLabels.slice(0, maxPoints);
+          const limitedData = activityData.slice(0, maxPoints);
+
+          // Graphique d'activité récente
+          new Chart(document.getElementById('activityChart'), {
+              type: 'line',
+              data: {
+                  labels: limitedLabels,
+                  datasets: [{
+                      label: 'Confiance (%)',
+                      data: limitedData,
+                      fill: false,
+                      borderColor: '#2196f3',
+                      tension: 0.1
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  scales: {
+                      y: {
+                          beginAtZero: true,
+                          max: 100
+                      }
+                  },
+                  plugins: {
+                      title: {
+                          display: true,
+                          text: 'Confiance des classifications récentes'
+                      }
+                  }
+              }
+          });
+      });
+    </script>
+  </body>
+</html>
