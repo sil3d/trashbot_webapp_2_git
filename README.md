@@ -39,7 +39,7 @@ best alternative solution save the image itsefl into the database , now we gonna
 2- classifie and save into database
 3-rotate motor
 
-static/thumbnails/Screenshot_222412.png
-static/thumbnails/Screenshot_222430.png
-static/thumbnails/Screenshot_222446.png
-static/thumbnails/Screenshot_222458.png
+![screenshot](static/thumbnails/Screenshot_222412.png)
+![screenshot](static/thumbnails/Screenshot_222430.png)
+![screenshot](static/thumbnails/Screenshot_222446.png)
+![screenshot](static/thumbnails/Screenshot_222458.png)
