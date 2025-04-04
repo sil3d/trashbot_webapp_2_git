@@ -1,10 +1,11 @@
 <!-- templates/index.html -->
+<!-- templates/index.html -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tri Automatique des Déchets</title>
+    <title>Automatic Waste Sorting System</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -88,37 +89,36 @@
   <body>
     <div class="header text-center">
       <h1>
-        <i class="fas fa-recycle"></i> Système de Tri Automatique des Déchets
+        <i class="fas fa-recycle"></i> Automatic Waste Sorting System
       </h1>
-      <p>
-        Utilisation de l'IA pour identifier et trier les matériaux recyclables
-      </p>
+      <p>Using AI to identify and sort recyclable materials</p>
     </div>
 
     <div class="container">
       <div class="row">
+        <!-- Live Camera Feed -->
         <div class="col-md-8">
           <div class="card">
             <div class="card-header bg-primary text-white">
-              <h3>Caméra en direct</h3>
+              <h3>Live Camera</h3>
             </div>
             <div class="card-body">
               <div class="video-container">
                 <img
                   src="{{ url_for('video_feed') }}"
                   width="100%"
-                  alt="Flux vidéo"
+                  alt="Video feed"
                 />
                 <div
                   id="camera-status"
                   class="status-badge bg-success text-white"
                 >
-                  Connecté
+                  Connected
                 </div>
               </div>
               <div class="mt-3 text-center">
                 <button id="classify-btn" class="btn btn-primary btn-lg">
-                  <i class="fas fa-camera"></i> Classifier l'objet
+                  <i class="fas fa-camera"></i> Classify Object
                 </button>
               </div>
             </div>
@@ -128,14 +128,14 @@
             id="result-section"
             class="result-container d-none result-animation"
           >
-            <h3 class="text-center mb-4">Résultat de la classification</h3>
+            <h3 class="text-center mb-4">Classification Result</h3>
             <div class="row">
               <div class="col-md-6">
                 <div class="text-center">
                   <img
                     id="captured-image"
                     src=""
-                    alt="Image capturée"
+                    alt="Captured image"
                     class="img-fluid rounded"
                   />
                 </div>
@@ -145,7 +145,7 @@
                   <div id="material-icon" class="material-icon">
                     <i class="fas fa-question-circle"></i>
                   </div>
-                  <h4 id="material-class">En attente...</h4>
+                  <h4 id="material-class">Waiting...</h4>
                   <div class="progress mt-3">
                     <div
                       id="confidence-bar"
@@ -161,7 +161,7 @@
                   </div>
                   <p id="confidence-text" class="mt-2">Confidence: 0%</p>
                   <div class="mt-3" id="motor-status">
-                    <span class="badge bg-secondary">Moteur: En attente</span>
+                    <span class="badge bg-secondary">Motor: Waiting</span>
                   </div>
                 </div>
               </div>
@@ -169,37 +169,38 @@
           </div>
         </div>
 
+        <!-- Manual Control & Status -->
         <div class="col-md-4">
           <div class="card">
             <div class="card-header bg-success text-white">
-              <h3>Contrôle manuel</h3>
+              <h3>Manual Control</h3>
             </div>
             <div class="card-body">
-              <p>Envoyez manuellement des commandes au trieur automatique:</p>
+              <p>Send manual commands to the auto-sorter:</p>
               <div class="d-grid gap-2">
                 <button
                   class="btn btn-outline-success manual-btn"
                   data-class="plastic"
                 >
-                  <i class="fas fa-bottle-water"></i> Plastique (Bac 1)
+                  <i class="fas fa-bottle-water"></i> Plastic (Bin 1)
                 </button>
                 <button
                   class="btn btn-outline-secondary manual-btn"
                   data-class="metal"
                 >
-                  <i class="fas fa-can-food"></i> Métal (Bac 2)
+                  <i class="fas fa-can-food"></i> Metal (Bin 2)
                 </button>
                 <button
                   class="btn btn-outline-info manual-btn"
                   data-class="glass"
                 >
-                  <i class="fas fa-wine-bottle"></i> Verre (Bac 3)
+                  <i class="fas fa-wine-bottle"></i> Glass (Bin 3)
                 </button>
                 <button
                   class="btn btn-outline-warning manual-btn"
                   data-class="unknown"
                 >
-                  <i class="fas fa-trash"></i> Inconnu (Bac 4)
+                  <i class="fas fa-trash"></i> Unknown (Bin 4)
                 </button>
               </div>
             </div>
@@ -207,22 +208,22 @@
 
           <div class="card mt-4">
             <div class="card-header bg-info text-white">
-              <h3>État du système</h3>
+              <h3>System Status</h3>
             </div>
             <div class="card-body">
               <ul class="list-group">
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center"
                 >
-                  Modèle AI
-                  <span id="model-status" class="badge bg-success">Chargé</span>
+                  AI Model
+                  <span id="model-status" class="badge bg-success">Loaded</span>
                 </li>
                 <li
                   class="list-group-item d-flex justify-content-between align-items-center"
                 >
-                  Caméra
+                  Camera
                   <span id="camera-status-sidebar" class="badge bg-success"
-                    >Connecté</span
+                    >Connected</span
                   >
                 </li>
                 <li
@@ -230,13 +231,13 @@
                 >
                   Arduino
                   <span id="arduino-status" class="badge bg-warning"
-                    >Vérification...</span
+                    >Checking...</span
                   >
                 </li>
               </ul>
               <div class="mt-3 text-center">
                 <a href="{{ url_for('history') }}" class="btn btn-info">
-                  <i class="fas fa-history"></i> Voir l'historique
+                  <i class="fas fa-history"></i> View History
                 </a>
               </div>
             </div>
@@ -247,8 +248,7 @@
 
     <footer class="bg-dark text-white text-center py-3 mt-5">
       <p>
-        © 2025 Système de Tri Automatique des Déchets | Powered by Flask &
-        TensorFlow
+        © 2025 Automatic Waste Sorting System | Powered by Flask & TensorFlow
       </p>
     </footer>
 
@@ -259,17 +259,14 @@
     ></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Vérifier l'état du système au chargement
         checkSystemStatus();
 
-        // Bouton de classification
         document
           .getElementById("classify-btn")
           .addEventListener("click", function () {
             classifyObject();
           });
 
-        // Boutons de contrôle manuel
         document.querySelectorAll(".manual-btn").forEach(function (button) {
           button.addEventListener("click", function () {
             const materialClass = this.getAttribute("data-class");
@@ -277,7 +274,6 @@
           });
         });
 
-        // Vérifier l'état du système toutes les 30 secondes
         setInterval(checkSystemStatus, 30000);
       });
 
@@ -285,7 +281,6 @@
         fetch("/status")
           .then((response) => response.json())
           .then((data) => {
-            // Mettre à jour les indicateurs d'état
             updateStatusIndicator("model-status", data.model_loaded);
             updateStatusIndicator("camera-status", data.camera_connected);
             updateStatusIndicator(
@@ -295,7 +290,7 @@
             updateStatusIndicator("arduino-status", data.arduino_connected);
           })
           .catch((error) => {
-            console.error("Erreur lors de la vérification de l'état:", error);
+            console.error("Error checking system status:", error);
           });
       }
 
@@ -303,10 +298,10 @@
         const element = document.getElementById(elementId);
         if (isConnected) {
           element.className = "badge bg-success";
-          element.textContent = "Connecté";
+          element.textContent = "Connected";
         } else {
           element.className = "badge bg-danger";
-          element.textContent = "Déconnecté";
+          element.textContent = "Disconnected";
         }
       }
 
@@ -314,30 +309,25 @@
         const classifyBtn = document.getElementById("classify-btn");
         classifyBtn.disabled = true;
         classifyBtn.innerHTML =
-          '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Classification...';
+          '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Classifying...';
 
         fetch("/classify", {
           method: "POST",
         })
           .then((response) => response.json())
           .then((data) => {
-            // Afficher la section de résultats
             document
               .getElementById("result-section")
               .classList.remove("d-none");
 
-            // Mettre à jour l'image capturée
             document.getElementById("captured-image").src =
               "/" + data.image_path;
 
-            // Mettre à jour la classe de matériau
             document.getElementById("material-class").textContent =
               capitalizeFirstLetter(data.class);
 
-            // Mettre à jour l'icône du matériau
             updateMaterialIcon(data.class);
 
-            // Mettre à jour la barre de confiance
             const confidencePercentage = (
               parseFloat(data.confidence) * 100
             ).toFixed(1);
@@ -346,37 +336,34 @@
             confidenceBar.textContent = confidencePercentage + "%";
             confidenceBar.setAttribute("aria-valuenow", confidencePercentage);
             document.getElementById("confidence-text").textContent =
-              "Confiance: " + confidencePercentage + "%";
+              "Confidence: " + confidencePercentage + "%";
 
-            // Mise à jour du statut du moteur
             const motorStatus = document.getElementById("motor-status");
             if (data.motor_success) {
               motorStatus.innerHTML =
-                '<span class="badge bg-success">Moteur: Bac activé</span>';
+                '<span class="badge bg-success">Motor: Bin activated</span>';
             } else {
               motorStatus.innerHTML =
-                '<span class="badge bg-danger">Moteur: Non connecté</span>';
+                '<span class="badge bg-danger">Motor: Not connected</span>';
             }
 
-            // Réactiver le bouton
             classifyBtn.disabled = false;
             classifyBtn.innerHTML =
-              '<i class="fas fa-camera"></i> Classifier l\'objet';
+              '<i class="fas fa-camera"></i> Classify Object';
           })
           .catch((error) => {
-            console.error("Erreur lors de la classification:", error);
+            console.error("Error during classification:", error);
             document
               .getElementById("result-section")
               .classList.remove("d-none");
             document.getElementById("material-class").textContent =
-              "Erreur de classification";
+              "Classification Error";
             document.getElementById("material-icon").innerHTML =
               '<i class="fas fa-exclamation-triangle text-danger"></i>';
 
-            // Réactiver le bouton
             classifyBtn.disabled = false;
             classifyBtn.innerHTML =
-              '<i class="fas fa-camera"></i> Classifier l\'objet';
+              '<i class="fas fa-camera"></i> Classify Object';
           });
       }
 
@@ -390,14 +377,13 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            // Feedback visuel temporaire
             const button = document.querySelector(
               `.manual-btn[data-class="${materialClass}"]`
             );
             const originalContent = button.innerHTML;
 
             if (data.motor_success) {
-              button.innerHTML = '<i class="fas fa-check"></i> Envoyé!';
+              button.innerHTML = '<i class="fas fa-check"></i> Sent!';
               button.classList.add("btn-success");
               button.classList.remove(
                 "btn-outline-success",
@@ -406,7 +392,7 @@
                 "btn-outline-warning"
               );
             } else {
-              button.innerHTML = '<i class="fas fa-times"></i> Erreur!';
+              button.innerHTML = '<i class="fas fa-times"></i> Error!';
               button.classList.add("btn-danger");
               button.classList.remove(
                 "btn-outline-success",
@@ -436,7 +422,7 @@
             }, 2000);
           })
           .catch((error) => {
-            console.error("Erreur lors de l'envoi de commande:", error);
+            console.error("Error sending command:", error);
           });
       }
 

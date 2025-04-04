@@ -1,10 +1,10 @@
 <!-- templates/history.html -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Historique de Tri des Déchets</title>
+    <title>Waste Sorting History</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -62,30 +62,30 @@
   </head>
   <body>
     <div class="header text-center">
-      <h1><i class="fas fa-history"></i> Historique de Tri des Déchets</h1>
-      <p>Journal des classifications précédentes et des actions du trieur</p>
+      <h1><i class="fas fa-history"></i> Waste Sorting History</h1>
+      <p>Log of previous classifications and sorting actions</p>
     </div>
 
     <div class="container">
       <div class="mb-4">
         <a href="{{ url_for('index') }}" class="btn btn-back text-white">
-          <i class="fas fa-arrow-left"></i> Retour au tableau de bord
+          <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
       </div>
 
       <div class="card">
         <div class="card-header bg-primary text-white">
-          <h3>Historique des Classifications</h3>
+          <h3>Classification History</h3>
         </div>
         <div class="card-body">
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>Date et heure</th>
+                  <th>Date & Time</th>
                   <th>Image</th>
-                  <th>Matériau</th>
-                  <th>Confiance</th>
+                  <th>Material</th>
+                  <th>Confidence</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,30 +97,29 @@
                     <img
                       src="/{{ item.image_path }}"
                       class="image-thumbnail"
-                      alt="Image de {{ item.material_class }}"
+                      alt="Image of {{ item.material_class }}"
                     />
                     {% else %}
-                    <span class="badge bg-secondary">Pas d'image</span>
+                    <span class="badge bg-secondary">No Image</span>
                     {% endif %}
                   </td>
                   <td>
                     {% if item.material_class == 'plastic' %}
-                    <span class="badge bg-success">Plastique</span>
+                    <span class="badge bg-success">Plastic</span>
                     {% elif item.material_class == 'metal' %}
-                    <span class="badge bg-secondary">Métal</span>
+                    <span class="badge bg-secondary">Metal</span>
                     {% elif item.material_class == 'glass' %}
-                    <span class="badge bg-info">Verre</span>
+                    <span class="badge bg-info">Glass</span>
                     {% else %}
-                    <span class="badge bg-warning">Inconnu</span>
+                    <span class="badge bg-warning">Unknown</span>
                     {% endif %}
                   </td>
-
                   <td>{{ (item.confidence * 100)|round(1) }}%</td>
                 </tr>
                 {% endfor %} {% else %}
                 <tr>
                   <td colspan="4" class="text-center">
-                    Aucune donnée d'historique disponible
+                    No historical data available
                   </td>
                 </tr>
                 {% endif %}
@@ -132,24 +131,23 @@
 
       <div class="card mt-4">
         <div class="card-header bg-success text-white">
-          <h3>Statistiques</h3>
+          <h3>Statistics</h3>
         </div>
         <div class="card-body">
           <div class="row">
-            <!-- templates/history.html (suite) -->
             <div class="col-md-6">
-              <h4>Répartition des matériaux</h4>
+              <h4>Material Distribution</h4>
               <canvas id="materialChart" width="400" height="300"></canvas>
             </div>
             <div class="col-md-6">
-              <h4>Tendance de confiance</h4>
+              <h4>Confidence Trend</h4>
               <canvas id="confidenceChart" width="400" height="300"></canvas>
             </div>
           </div>
 
           <div class="row mt-4">
             <div class="col-md-12">
-              <h4>Activité récente</h4>
+              <h4>Recent Activity</h4>
               <canvas id="activityChart" width="800" height="200"></canvas>
             </div>
           </div>
@@ -159,8 +157,7 @@
 
     <footer class="bg-dark text-white text-center py-3 mt-5">
       <p>
-        © 2025 Système de Tri Automatique des Déchets | Powered by Flask &
-        TensorFlow
+        © 2025 Automatic Waste Sorting System | Powered by Flask & TensorFlow
       </p>
     </footer>
 
@@ -172,10 +169,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-          // Données pour les graphiques
           const data = {{ data|tojson }};
 
-          // Préparation des données pour les graphiques
           const materialCounts = {
               'plastic': 0,
               'metal': 0,
@@ -193,32 +188,26 @@
           const dateLabels = [];
           const activityData = [];
 
-          // Organisation des données
           data.forEach(item => {
-              // Vérifier si le material_class est attendu sinon le forcer à 'unknown'
               let material = item.material_class;
               if (!confidenceData.hasOwnProperty(material)) {
                   material = 'unknown';
               }
 
-              // Compter les matériaux
               materialCounts[material]++;
-
-              // Collecter les données de confiance
               confidenceData[material].push(item.confidence * 100);
 
-              // Données d'activité
               const date = new Date(item.timestamp);
               const formattedDate = `${date.toLocaleDateString()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
               dateLabels.unshift(formattedDate);
               activityData.unshift(item.confidence * 100);
           });
 
-          // Graphique de répartition des matériaux
+          // Pie chart: Material Distribution
           new Chart(document.getElementById('materialChart'), {
               type: 'pie',
               data: {
-                  labels: ['Plastique', 'Métal', 'Verre', 'Inconnu'],
+                  labels: ['Plastic', 'Metal', 'Glass', 'Unknown'],
                   datasets: [{
                       data: [
                           materialCounts.plastic,
@@ -227,10 +216,10 @@
                           materialCounts.unknown
                       ],
                       backgroundColor: [
-                          '#43a047',  // Vert pour plastique
-                          '#546e7a',  // Gris pour métal
-                          '#03a9f4',  // Bleu pour verre
-                          '#ff9800'   // Orange pour inconnu
+                          '#43a047',  // Green for plastic
+                          '#546e7a',  // Grey for metal
+                          '#03a9f4',  // Blue for glass
+                          '#ff9800'   // Orange for unknown
                       ],
                       borderWidth: 1
                   }]
@@ -243,25 +232,25 @@
                       },
                       title: {
                           display: true,
-                          text: 'Distribution des types de matériaux'
+                          text: 'Material Type Distribution'
                       }
                   }
               }
           });
 
-          // Calcul des moyennes de confiance
+          // Function to compute average confidence
           const getAverageConfidence = (values) => {
               if (values.length === 0) return 0;
               return values.reduce((sum, val) => sum + val, 0) / values.length;
           };
 
-          // Graphique de confiance moyenne
+          // Bar chart: Average Confidence per Material
           new Chart(document.getElementById('confidenceChart'), {
               type: 'bar',
               data: {
-                  labels: ['Plastique', 'Métal', 'Verre', 'Inconnu'],
+                  labels: ['Plastic', 'Metal', 'Glass', 'Unknown'],
                   datasets: [{
-                      label: 'Confiance moyenne (%)',
+                      label: 'Average Confidence (%)',
                       data: [
                           getAverageConfidence(confidenceData.plastic),
                           getAverageConfidence(confidenceData.metal),
@@ -269,10 +258,10 @@
                           getAverageConfidence(confidenceData.unknown)
                       ],
                       backgroundColor: [
-                          '#43a047',  // Vert pour plastique
-                          '#546e7a',  // Gris pour métal
-                          '#03a9f4',  // Bleu pour verre
-                          '#ff9800'   // Orange pour inconnu
+                          '#43a047',
+                          '#546e7a',
+                          '#03a9f4',
+                          '#ff9800'
                       ],
                       borderWidth: 1
                   }]
@@ -288,24 +277,23 @@
                   plugins: {
                       title: {
                           display: true,
-                          text: 'Confiance moyenne par type de matériau'
+                          text: 'Average Confidence by Material Type'
                       }
                   }
               }
           });
 
-          // Limiter le nombre de points pour le graphique d'activité
+          // Line chart: Recent Activity (limit points to avoid clutter)
           const maxPoints = 20;
           const limitedLabels = dateLabels.slice(0, maxPoints);
           const limitedData = activityData.slice(0, maxPoints);
 
-          // Graphique d'activité récente
           new Chart(document.getElementById('activityChart'), {
               type: 'line',
               data: {
                   labels: limitedLabels,
                   datasets: [{
-                      label: 'Confiance (%)',
+                      label: 'Confidence (%)',
                       data: limitedData,
                       fill: false,
                       borderColor: '#2196f3',
@@ -323,7 +311,7 @@
                   plugins: {
                       title: {
                           display: true,
-                          text: 'Confiance des classifications récentes'
+                          text: 'Recent Classification Confidence'
                       }
                   }
               }
