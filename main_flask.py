@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response, jsonify
+from flask import Flask, render_template, request, Response, jsonify, send_file
 import cv2
 import numpy as np
 import serial
@@ -10,6 +10,8 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import re
+import pandas as pd
+
 
 app = Flask(__name__)
 
@@ -324,6 +326,28 @@ def status():
         'labels': labels if labels else []
     }
     return jsonify(system_status)
+
+@app.route('/download_report')
+def download_report():
+    # Connect to the database
+    conn = sqlite3.connect('waste_sorting.db')
+
+    # Read the data into a pandas DataFrame
+    df = pd.read_sql_query("SELECT * FROM sorting_history", conn)
+
+    # Close the connection
+    conn.close()
+
+    # Define the path for the Excel report
+    report_path = os.path.join('static', 'waste_report.xlsx')
+
+    # Export DataFrame to Excel
+    df.to_excel(report_path, index=False)
+
+    # Send the Excel file to the user
+    return send_file(report_path, as_attachment=True)
+
+
 
 if __name__ == '__main__':
     init_db()
